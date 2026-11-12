@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioScience & Pharmacology Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="glass-header">
+        <div class="logo">BIO<span>SCIENCE</span> HUB</div>
+        <a href="admin.html" class="admin-link">Admin Login</a>
+    </header>
+
+    <section class="hero">
+        <h1 id="heroTitle">Loading Research Hub...</h1>
+        <p id="heroSubtitle">Please wait while we fetch the latest clinical insights.</p>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search articles, compounds, mechanisms...">
+        </div>
+
+        <div class="category-tabs">
+            <button class="cat-btn active" data-cat="All">All Research</button>
+            <button class="cat-btn" data-cat="Pharmacology">Steroids & Pharmacology</button>
+            <button class="cat-btn" data-cat="PCT">Post-Cycle Therapy (PCT)</button>
+            <button class="cat-btn" data-cat="Nutrition">Nutrition & Diet Science</button>
+            <button class="cat-btn" data-cat="General">General Updates</button>
+        </div>
+    </section>
+
+    <main class="container" id="articlesContainer">
+        <!-- Firebase se articles yahan automatically load honge -->
+    </main>
+
+    <footer class="glass-footer">
+        <p><strong>Disclaimer:</strong> Strictly for educational and scientific awareness purposes only. Not medical advice.</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKphbLdXN9-sLIgnkmFRDPvVKmJI-LLc",
+            authDomain: "bioscience-cms-a8c93.firebaseapp.com",
+            projectId: "bioscience-cms-a8c93",
+            storageBucket: "bioscience-cms-a8c93.appspot.com",
+            messagingSenderId: "287852857500",
+            appId: "1:287852857500:web:f859233d28faa58b3c0559"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allArticles = [];
+        let currentCategory = "All";
+
+        async function loadHomeSettings() {
+            const docRef = doc(db, "settings", "home");
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                document.getElementById("heroTitle").innerHTML = docSnap.data().title;
+                document.getElementById("heroSubtitle").textContent = docSnap.data().subtitle;
+            } else {
+                document.getElementById("heroTitle").innerHTML = "Evidence-Based <span>Fitness & Endocrine</span> Research";
+                document.getElementById("heroSubtitle").textContent = "Scientific mechanisms, clinical trials, and post-cycle recovery physiology.";
+            }
+        }
+
+        async function loadArticles() {
+            const q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            allArticles = [];
+            querySnapshot.forEach((doc) => {
+                allArticles.push({ id: doc.id, ...doc.data() });
+            });
+            renderArticles();
+        }
+
+        function renderArticles() {
+            const container = document.getElementById("articlesContainer");
+            const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+            container.innerHTML = "";
+
+            const filtered = allArticles.filter(art => {
+                const matchesCat = currentCategory === "All" || art.category === currentCategory;
+                const matchesSearch = art.title.toLowerCase().includes(searchQuery) || 
+                                      art.summary.toLowerCase().includes(searchQuery) || 
+                                      art.details.toLowerCase().includes(searchQuery);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = "<p style='text-align:center; grid-column:1/-1; color:#94a3b8;'>No articles found in this section yet.</p>";
+                return;
+            }
+
+            filtered.forEach(art => {
+                const card = document.createElement("article");
+                card.className = "glass-card";
+                card.innerHTML = `
+                    <span class="tag">${art.category}</span>
+                    <h2>${art.title}</h2>
+                    <p class="summary">${art.summary}</p>
+                    <div class="details hidden">${art.details.replace(/\n/g, '<br>')}</div>
+                    <button class="toggle-btn" onclick="toggleDetails(this)">Read Full Research</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.toggleDetails = function(btn) {
+            const details = btn.previousElementSibling;
+            details.classList.toggle("hidden");
+            btn.textContent = details.classList.contains("hidden") ? "Read Full Research" : "Hide Details";
+        };
+
+        document.querySelectorAll(".cat-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentCategory = btn.getAttribute("data-cat");
+                renderArticles();
+            });
+        });
+
+        document.getElementById("searchInput").addEventListener("input", renderArticles);
+
+        loadHomeSettings();
+        loadArticles();
+    </script>
+</body>
+</html>
