@@ -146,42 +146,67 @@
       <p>Advanced Pharmacology & Clinical Research Documentation Portal</p>
     </header>
 
-    <div class="articles-grid" id="articlesContainer">
-      <!-- Article Card 1 with Monetized Ad Link -->
-      <div class="article-card">
-        <div class="article-meta">
-          <span class="badge">Bioscience Research</span>
-          <span class="status">Active Node</span>
-        </div>
-        <h3 class="article-title">Advanced Pharmacology & Therapeutics Insights</h3>
-        <p class="article-desc">Explore cutting-edge documentation, clinical trials data, and peer-reviewed bio-molecular breakthroughs.</p>
-        
-        <div class="btn-group">
-          <!-- APNA ADSTERRA SMARTLINK YAHAN PASTE KAREIN -->
-          <a href="YOUR_ADSTERRA_SMARTLINK_HERE" target="_blank" class="monetized-btn">
-            📥 Download PDF (Sponsored)
-          </a>
-        </div>
-      </div>
-
-      <!-- Article Card 2 with Monetized Ad Link -->
-      <div class="article-card">
-        <div class="article-meta">
-          <span class="badge">Clinical Trial</span>
-          <span class="status">Verified Data</span>
-        </div>
-        <h3 class="article-title">Molecular Mechanisms of Cellular Regeneration</h3>
-        <p class="article-desc">Comprehensive analysis of therapeutic compound interactions and biochemical pathway responses.</p>
-        
-        <div class="btn-group">
-          <!-- APNA ADSTERRA SMARTLINK YAHAN PASTE KAREIN -->
-          <a href="YOUR_ADSTERRA_SMARTLINK_HERE" target="_blank" class="monetized-btn">
-            📥 Download PDF (Sponsored)
-          </a>
-        </div>
-      </div>
+    <div class="articles-grid" id="liveArticlesContainer">
+      <p style="color: var(--text-muted); text-align: center;">Loading live research papers...</p>
     </div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMmITK0UccstsasUCmDGnEoskDDCyTpIc",
+      authDomain: "bioscience-cms-3c193.firebaseapp.com",
+      projectId: "bioscience-cms-3c193",
+      storageBucket: "bioscience-cms-3c193.firebasestorage.app",
+      messagingSenderId: "727673748710",
+      appId: "1:727673748710:web:361f104a46e3bcb75fcf27"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const container = document.getElementById("liveArticlesContainer");
+
+    async function fetchLiveArticles() {
+      try {
+        const q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          container.innerHTML = `<p style="color: var(--text-muted); text-align: center;">No active research documents found.</p>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          
+          const card = document.createElement("div");
+          card.className = "article-card";
+          card.innerHTML = `
+            <div class="article-meta">
+              <span class="badge">${data.category || 'Research'}</span>
+              <span class="status">Active Node</span>
+            </div>
+            <h3 class="article-title">${data.title}</h3>
+            <p class="article-desc">${data.description}</p>
+            <div class="btn-group">
+              <a href="${data.adLink || '#'}" target="_blank" class="monetized-btn">
+                📥 Download PDF (Sponsored)
+              </a>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<p style="color: #ff0055; text-align: center;">Failed to load live feed from database.</p>`;
+      }
+    }
+
+    fetchLiveArticles();
+  </script>
 </body>
 </html>
