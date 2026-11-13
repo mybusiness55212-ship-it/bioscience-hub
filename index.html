@@ -117,24 +117,43 @@
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
-    .monetized-btn {
-      flex: 1;
-      text-align: center;
-      background: linear-gradient(135deg, #00f0ff, #0077ff);
-      color: #030712;
-      font-weight: bold;
-      padding: 0.75rem 1rem;
+    /* Clean Sleek Action Button */
+    .action-btn {
+      background: transparent;
+      color: var(--neon-blue);
+      border: 1px solid var(--neon-blue);
+      padding: 0.5rem 1.25rem;
       border-radius: 8px;
       text-decoration: none;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+      font-weight: 600;
+      font-size: 0.85rem;
       transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .monetized-btn:hover {
-      opacity: 0.9;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.7);
+    .action-btn:hover {
+      background: var(--neon-blue);
+      color: #030712;
+      box-shadow: 0 0 15px var(--neon-glow);
+    }
+
+    /* Subtle Sponsor Link */
+    .sponsor-link {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: color 0.2s;
+      margin-left: auto;
+    }
+
+    .sponsor-link:hover {
+      color: var(--neon-blue);
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -193,8 +212,11 @@
             <h3 class="article-title">${data.title}</h3>
             <p class="article-desc">${data.description}</p>
             <div class="btn-group">
-              <a href="${data.adLink || '#'}" target="_blank" class="monetized-btn">
-                📥 Download PDF (Sponsored)
+              <a href="${data.pdfUrl || '#'}" target="_blank" class="action-btn">
+                📄 View / Download PDF
+              </a>
+              <a href="${data.adLink || '#'}" target="_blank" class="sponsor-link">
+                ⚡ Sponsored Resource
               </a>
             </div>
           `;
