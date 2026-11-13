@@ -55,10 +55,11 @@
         </form>
       </div>
 
-      <!-- 2. Publish Research Article & Free PDF Link -->
+      <!-- 2. Publish / Edit Research Article -->
       <div class="admin-box">
-        <h2>2. Publish Research Article / Free PDF Book</h2>
+        <h2 id="formHeading">2. Publish New Research Article / PDF Book</h2>
         <form id="articleForm">
+          <input type="hidden" id="editArticleId" value="" />
           <div class="form-group">
             <label for="articleCategory">Select Category</label>
             <select id="articleCategory" class="form-control" required>
@@ -70,7 +71,7 @@
           </div>
           <div class="form-group">
             <label for="articleTitle">Article / Book Title</label>
-            <input type="text" id="articleTitle" class="form-control" placeholder="e.g., Complete Pharmacology Guide Book" required />
+            <input type="text" id="articleTitle" class="form-control" placeholder="e.g., Dianabol Mechanism" required />
           </div>
           <div class="form-group">
             <label for="articleSummary">Short Summary</label>
@@ -78,20 +79,21 @@
           </div>
           <div class="form-group">
             <label for="articleContent">Full Detailed Scientific Information</label>
-            <textarea id="articleContent" class="form-control" placeholder="Write description or notes here..."></textarea>
+            <textarea id="articleContent" class="form-control" placeholder="Write description..."></textarea>
           </div>
           <div class="form-group">
-            <label for="pdfUrlInput">PDF Download Link (Google Drive / Direct URL - Optional)</label>
+            <label for="pdfUrlInput">PDF Download Link (Google Drive / Direct URL)</label>
             <input type="url" id="pdfUrlInput" class="form-control" placeholder="https://drive.google.com/file/d/.../view" />
           </div>
-          <button type="submit" class="primary-btn">Publish Live Now</button>
+          <button type="submit" id="submitBtn" class="primary-btn">Publish Live Now</button>
+          <button type="button" id="cancelEditBtn" class="danger-btn" style="display:none; width:100%; margin-top:0.6rem;">Cancel Edit</button>
           <div id="articleStatus" class="status-msg"></div>
         </form>
       </div>
 
       <!-- 3. Manage Published Articles -->
       <div class="admin-box">
-        <h2>3. Manage Published Items</h2>
+        <h2>3. Manage Published Items (Edit or Delete)</h2>
         <div id="manageList">
           <p style="color:#94a3b8;">Loading items...</p>
         </div>
@@ -101,14 +103,14 @@
   </main>
 
   <footer>
-    BioScience Hub CMS &bull; 100% Free Firebase Firestore Backend
+    BioScience Hub CMS &bull; Secure Firebase Cloud Backend
   </footer>
 
-  <!-- Firebase Modular SDK -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, getDocs, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, getDocs, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDMmITK0UccstsasUCmDGnEoskDDCyTpIc",
@@ -190,34 +192,53 @@
       }
     });
 
-    // Publish Article with Free PDF Link
-    document.getElementById("articleForm").addEventListener("submit", async (e) => {
+    // Publish or Update Article Form
+    const articleForm = document.getElementById("articleForm");
+    articleForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const status = document.getElementById("articleStatus");
+      const editId = document.getElementById("editArticleId").value;
       status.style.color = "#00f0ff";
-      status.textContent = "Publishing live...";
+      status.textContent = editId ? "Updating article..." : "Publishing live...";
 
       try {
-        const pdfUrl = document.getElementById("pdfUrlInput").value.trim();
-
-        await addDoc(collection(db, "articles"), {
+        const articleData = {
           category: document.getElementById("articleCategory").value,
           title: document.getElementById("articleTitle").value.trim(),
           summary: document.getElementById("articleSummary").value.trim(),
           content: document.getElementById("articleContent").value.trim(),
-          pdfUrl: pdfUrl,
-          createdAt: serverTimestamp()
-        });
+          pdfUrl: document.getElementById("pdfUrlInput").value.trim(),
+          updatedAt: serverTimestamp()
+        };
 
-        status.style.color = "#00e676";
-        status.textContent = "Published successfully!";
-        document.getElementById("articleForm").reset();
+        if (editId) {
+          await updateDoc(doc(db, "articles", editId), articleData);
+          status.style.color = "#00e676";
+          status.textContent = "Article updated successfully!";
+          resetForm();
+        } else {
+          articleData.createdAt = serverTimestamp();
+          await addDoc(collection(db, "articles"), articleData);
+          status.style.color = "#00e676";
+          status.textContent = "Published successfully!";
+          articleForm.reset();
+        }
         loadAdminArticles();
       } catch (err) {
         status.style.color = "#ff3b5c";
         status.textContent = "Error: " + err.message;
       }
     });
+
+    function resetForm() {
+      document.getElementById("editArticleId").value = "";
+      document.getElementById("formHeading").textContent = "2. Publish New Research Article / PDF Book";
+      document.getElementById("submitBtn").textContent = "Publish Live Now";
+      document.getElementById("cancelEditBtn").style.display = "none";
+      articleForm.reset();
+    }
+
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
 
     async function loadAdminArticles() {
       const manageList = document.getElementById("manageList");
@@ -238,16 +259,36 @@
           item.innerHTML = `
             <div>
               <strong style="color:#fff;">${escapeHtml(data.title)}</strong>
-              <div style="font-size:0.82rem; color:#00f0ff;">${escapeHtml(data.category)} ${data.pdfUrl ? '🔗 [PDF Link Attached]' : ''}</div>
+              <div style="font-size:0.82rem; color:#00f0ff;">${escapeHtml(data.category)}</div>
             </div>
-            <button class="danger-btn">Delete</button>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="nav-btn edit-btn" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Edit</button>
+              <button class="danger-btn delete-btn">Delete</button>
+            </div>
           `;
-          item.querySelector(".danger-btn").addEventListener("click", async () => {
+
+          // Edit Click
+          item.querySelector(".edit-btn").addEventListener("click", () => {
+            document.getElementById("editArticleId").value = docSnap.id;
+            document.getElementById("articleCategory").value = data.category || "Steroids & Pharmacology";
+            document.getElementById("articleTitle").value = data.title || "";
+            document.getElementById("articleSummary").value = data.summary || "";
+            document.getElementById("articleContent").value = data.content || "";
+            document.getElementById("pdfUrlInput").value = data.pdfUrl || "";
+            document.getElementById("formHeading").textContent = "Edit Research Article";
+            document.getElementById("submitBtn").textContent = "Update Article";
+            document.getElementById("cancelEditBtn").style.display = "block";
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+          });
+
+          // Delete Click
+          item.querySelector(".delete-btn").addEventListener("click", async () => {
             if (confirm("Permanently delete this item?")) {
               await deleteDoc(doc(db, "articles", docSnap.id));
               loadAdminArticles();
             }
           });
+
           manageList.appendChild(item);
         });
       } catch (err) {
