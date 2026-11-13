@@ -1,116 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Control Panel | BioScience Hub</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - BioScience Hub</title>
+  <style>
+    :root {
+      --bg-color: #030712;
+      --card-bg: rgba(13, 20, 38, 0.8);
+      --neon-blue: #00f0ff;
+      --neon-pink: #ff0055;
+      --neon-green: #00ff88;
+      --neon-glow: rgba(0, 240, 255, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(0, 240, 255, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 25px var(--neon-glow);
+    }
+
+    header h1 {
+      color: var(--neon-blue);
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .live-link {
+      color: #030712;
+      background: var(--neon-blue);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .panel-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .glass-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.08);
+    }
+
+    .glass-box h2 {
+      color: var(--neon-blue);
+      font-size: 1.2rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(3, 7, 18, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, #00f0ff, #0077ff);
+      color: #030712;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+      transition: all 0.3s;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.9;
+    }
+
+    .btn-cancel {
+      width: 100%;
+      padding: 0.7rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .article-item {
+      background: rgba(3, 7, 18, 0.6);
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .article-item h4 {
+      color: var(--text-main);
+      margin-bottom: 0.3rem;
+      font-size: 1.05rem;
+    }
+
+    .article-item p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .edit-btn, .delete-btn {
+      padding: 0.45rem 0.9rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .edit-btn {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--neon-green);
+      border: 1px solid var(--neon-green);
+    }
+
+    .edit-btn:hover {
+      background: var(--neon-green);
+      color: #030712;
+    }
+
+    .delete-btn {
+      background: rgba(255, 0, 85, 0.15);
+      color: var(--neon-pink);
+      border: 1px solid var(--neon-pink);
+    }
+
+    .delete-btn:hover {
+      background: var(--neon-pink);
+      color: #ffffff;
+    }
+
+    #statusMsg {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: var(--neon-green);
+    }
+  </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <a href="index.html" class="logo">BIOSCIENCE ADMIN</a>
-    <div>
-      <a href="index.html" class="nav-btn" style="margin-right:0.6rem;">View Live Website</a>
-      <button id="logoutBtn" class="danger-btn" style="display:none;">Logout</button>
-    </div>
-  </nav>
-
-  <main class="container">
-
-    <!-- LOGIN SECTION -->
-    <div id="loginSection" class="admin-box" style="max-width:440px;">
-      <h2>Admin Authentication</h2>
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="adminEmail">Admin Email</label>
-          <input type="email" id="adminEmail" class="form-control" placeholder="abudhabisyed80@gmail.com" required />
-        </div>
-        <div class="form-group">
-          <label for="adminPassword">Password</label>
-          <input type="password" id="adminPassword" class="form-control" placeholder="Enter your password" required />
-        </div>
-        <button type="submit" class="primary-btn">Login to Dashboard</button>
-        <div id="loginStatus" class="status-msg"></div>
-      </form>
-    </div>
-
-    <!-- DASHBOARD SECTION -->
-    <div id="dashboardSection" style="display:none;">
-
-      <!-- 1. Home Banner Updater -->
-      <div class="admin-box">
-        <h2>1. Update Home Page Banner</h2>
-        <form id="bannerForm">
-          <div class="form-group">
-            <label for="bannerTitle">Main Hero Title</label>
-            <input type="text" id="bannerTitle" class="form-control" required />
-          </div>
-          <div class="form-group">
-            <label for="bannerSubtitle">Hero Subtitle</label>
-            <input type="text" id="bannerSubtitle" class="form-control" required />
-          </div>
-          <button type="submit" class="primary-btn">Save Banner Changes</button>
-          <div id="bannerStatus" class="status-msg"></div>
-        </form>
+  <div class="container">
+    <header>
+      <div>
+        <h1>⚡ BioScience CMS Admin</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Manage Research Articles & Monetized Links</p>
       </div>
+      <a href="index.html" target="_blank" class="live-link">View Live Portal ↗</a>
+    </header>
 
-      <!-- 2. Publish / Edit Research Article -->
-      <div class="admin-box">
-        <h2 id="formHeading">2. Publish New Research Article / PDF Book</h2>
+    <div class="panel-grid">
+      <!-- Left: Publish / Edit Form -->
+      <div class="glass-box">
+        <h2 id="formHeading">Publish New Research</h2>
         <form id="articleForm">
-          <input type="hidden" id="editArticleId" value="" />
+          <input type="hidden" id="editDocId">
+
           <div class="form-group">
-            <label for="articleCategory">Select Category</label>
-            <select id="articleCategory" class="form-control" required>
-              <option value="Steroids & Pharmacology">Steroids &amp; Pharmacology</option>
-              <option value="Post-Cycle Therapy (PCT)">Post-Cycle Therapy (PCT)</option>
-              <option value="Nutrition & Diet Science">Nutrition &amp; Diet Science</option>
-              <option value="General Updates">General Updates</option>
+            <label>Category / Tag</label>
+            <select id="category">
+              <option value="Bioscience Research">Bioscience Research</option>
+              <option value="Pharmacology">Pharmacology</option>
+              <option value="Clinical Trial">Clinical Trial</option>
+              <option value="Molecular Biology">Molecular Biology</option>
             </select>
           </div>
+
           <div class="form-group">
-            <label for="articleTitle">Article / Book Title</label>
-            <input type="text" id="articleTitle" class="form-control" placeholder="e.g., Dianabol Mechanism" required />
+            <label>Research Title</label>
+            <input type="text" id="title" placeholder="e.g., Neuro-Pharmacological Pathways..." required>
           </div>
+
           <div class="form-group">
-            <label for="articleSummary">Short Summary</label>
-            <input type="text" id="articleSummary" class="form-control" placeholder="Brief overview..." required />
+            <label>Abstract / Summary</label>
+            <textarea id="description" placeholder="Short summary of the research paper..." required></textarea>
           </div>
+
           <div class="form-group">
-            <label for="articleContent">Full Detailed Scientific Information</label>
-            <textarea id="articleContent" class="form-control" placeholder="Write description..."></textarea>
+            <label>PDF / Google Drive Link (Optional)</label>
+            <input type="url" id="pdfUrl" placeholder="https://drive.google.com/...">
           </div>
+
           <div class="form-group">
-            <label for="pdfUrlInput">PDF Download Link (Google Drive / Direct URL)</label>
-            <input type="url" id="pdfUrlInput" class="form-control" placeholder="https://drive.google.com/file/d/.../view" />
+            <label>Adsterra Smartlink (Monetized Redirect)</label>
+            <input type="url" id="adLink" placeholder="Paste your Adsterra Smartlink here" required>
           </div>
-          <button type="submit" id="submitBtn" class="primary-btn">Publish Live Now</button>
-          <button type="button" id="cancelEditBtn" class="danger-btn" style="display:none; width:100%; margin-top:0.6rem;">Cancel Edit</button>
-          <div id="articleStatus" class="status-msg"></div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">🚀 Publish Article</button>
+          <button type="button" class="btn-cancel" id="cancelEditBtn">Cancel Edit</button>
+          <div id="statusMsg"></div>
         </form>
       </div>
 
-      <!-- 3. Manage Published Articles -->
-      <div class="admin-box">
-        <h2>3. Manage Published Items (Edit or Delete)</h2>
-        <div id="manageList">
-          <p style="color:#94a3b8;">Loading items...</p>
+      <!-- Right: Manage Existing Articles -->
+      <div class="glass-box">
+        <h2>Published Articles (Live Database)</h2>
+        <div id="adminArticlesList">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Loading articles from Firestore...</p>
         </div>
       </div>
-
     </div>
-  </main>
+  </div>
 
-  <footer>
-    BioScience Hub CMS &bull; Secure Firebase Cloud Backend
-  </footer>
-
-  <!-- Firebase SDK -->
+  <!-- Firebase Modular SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDoc, addDoc, updateDoc, getDocs, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { 
+      getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDMmITK0UccstsasUCmDGnEoskDDCyTpIc",
@@ -121,186 +307,136 @@
       appId: "1:727673748710:web:361f104a46e3bcb75fcf27"
     };
 
+    // Aapka Adsterra Smartlink pre-configured
+    const DEFAULT_SMARTLINK = "https://www.highcpmrevenuegate.com/cc32257074?key=your_smartlink_id"; 
+
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
+    const articlesCol = collection(db, "articles");
 
-    const loginSection = document.getElementById("loginSection");
-    const dashboardSection = document.getElementById("dashboardSection");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const loginStatus = document.getElementById("loginStatus");
+    const form = document.getElementById("articleForm");
+    const editDocIdInput = document.getElementById("editDocId");
+    const categoryInput = document.getElementById("category");
+    const titleInput = document.getElementById("title");
+    const descInput = document.getElementById("description");
+    const pdfUrlInput = document.getElementById("pdfUrl");
+    const adLinkInput = document.getElementById("adLink");
+    const submitBtn = document.getElementById("submitBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const formHeading = document.getElementById("formHeading");
+    const statusMsg = document.getElementById("statusMsg");
+    const articlesList = document.getElementById("adminArticlesList");
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        loginSection.style.display = "none";
-        dashboardSection.style.display = "block";
-        logoutBtn.style.display = "inline-block";
-        loadCurrentBanner();
-        loadAdminArticles();
-      } else {
-        loginSection.style.display = "block";
-        dashboardSection.style.display = "none";
-        logoutBtn.style.display = "none";
-      }
-    });
+    adLinkInput.value = DEFAULT_SMARTLINK;
 
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("adminEmail").value.trim();
-      const password = document.getElementById("adminPassword").value;
-      loginStatus.style.color = "#00f0ff";
-      loginStatus.textContent = "Authenticating...";
-
+    async function loadArticles() {
+      articlesList.innerHTML = `<p style="color: var(--text-muted);">Fetching records...</p>`;
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        loginStatus.textContent = "";
-      } catch (err) {
-        loginStatus.style.color = "#ff3b5c";
-        loginStatus.textContent = "Login Failed: " + err.message;
-      }
-    });
-
-    logoutBtn.addEventListener("click", () => signOut(auth));
-
-    async function loadCurrentBanner() {
-      try {
-        const snap = await getDoc(doc(db, "settings", "homeBanner"));
-        if (snap.exists()) {
-          document.getElementById("bannerTitle").value = snap.data().title || "";
-          document.getElementById("bannerSubtitle").value = snap.data().subtitle || "";
-        }
-      } catch (err) {}
-    }
-
-    document.getElementById("bannerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const status = document.getElementById("bannerStatus");
-      status.style.color = "#00f0ff";
-      status.textContent = "Saving banner...";
-
-      try {
-        await setDoc(doc(db, "settings", "homeBanner"), {
-          title: document.getElementById("bannerTitle").value.trim(),
-          subtitle: document.getElementById("bannerSubtitle").value.trim(),
-          updatedAt: serverTimestamp()
-        });
-        status.style.color = "#00e676";
-        status.textContent = "Home banner updated live!";
-      } catch (err) {
-        status.style.color = "#ff3b5c";
-        status.textContent = "Error: " + err.message;
-      }
-    });
-
-    // Publish or Update Article Form
-    const articleForm = document.getElementById("articleForm");
-    articleForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const status = document.getElementById("articleStatus");
-      const editId = document.getElementById("editArticleId").value;
-      status.style.color = "#00f0ff";
-      status.textContent = editId ? "Updating article..." : "Publishing live...";
-
-      try {
-        const articleData = {
-          category: document.getElementById("articleCategory").value,
-          title: document.getElementById("articleTitle").value.trim(),
-          summary: document.getElementById("articleSummary").value.trim(),
-          content: document.getElementById("articleContent").value.trim(),
-          pdfUrl: document.getElementById("pdfUrlInput").value.trim(),
-          updatedAt: serverTimestamp()
-        };
-
-        if (editId) {
-          await updateDoc(doc(db, "articles", editId), articleData);
-          status.style.color = "#00e676";
-          status.textContent = "Article updated successfully!";
-          resetForm();
-        } else {
-          articleData.createdAt = serverTimestamp();
-          await addDoc(collection(db, "articles"), articleData);
-          status.style.color = "#00e676";
-          status.textContent = "Published successfully!";
-          articleForm.reset();
-        }
-        loadAdminArticles();
-      } catch (err) {
-        status.style.color = "#ff3b5c";
-        status.textContent = "Error: " + err.message;
-      }
-    });
-
-    function resetForm() {
-      document.getElementById("editArticleId").value = "";
-      document.getElementById("formHeading").textContent = "2. Publish New Research Article / PDF Book";
-      document.getElementById("submitBtn").textContent = "Publish Live Now";
-      document.getElementById("cancelEditBtn").style.display = "none";
-      articleForm.reset();
-    }
-
-    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
-
-    async function loadAdminArticles() {
-      const manageList = document.getElementById("manageList");
-      try {
-        const q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-
-        if (snap.empty) {
-          manageList.innerHTML = `<p style="color:#94a3b8;">No items published yet.</p>`;
+        const q = query(articlesCol, orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+          articlesList.innerHTML = `<p style="color: var(--text-muted);">No articles published yet.</p>`;
           return;
         }
 
-        manageList.innerHTML = "";
-        snap.forEach(docSnap => {
+        articlesList.innerHTML = "";
+        snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          const item = document.createElement("div");
-          item.className = "manage-item";
-          item.innerHTML = `
-            <div>
-              <strong style="color:#fff;">${escapeHtml(data.title)}</strong>
-              <div style="font-size:0.82rem; color:#00f0ff;">${escapeHtml(data.category)}</div>
-            </div>
-            <div style="display:flex; gap:0.5rem;">
-              <button class="nav-btn edit-btn" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Edit</button>
-              <button class="danger-btn delete-btn">Delete</button>
+          const id = docSnap.id;
+
+          const card = document.createElement("div");
+          card.className = "article-item";
+          card.innerHTML = `
+            <span style="font-size: 0.7rem; color: var(--neon-blue); text-transform: uppercase;">${data.category || 'Research'}</span>
+            <h4>${data.title}</h4>
+            <p>${data.description}</p>
+            <div class="action-btns">
+              <button class="edit-btn" data-id="${id}">✏️ Edit</button>
+              <button class="delete-btn" data-id="${id}">🗑️ Delete</button>
             </div>
           `;
 
-          // Edit Click
-          item.querySelector(".edit-btn").addEventListener("click", () => {
-            document.getElementById("editArticleId").value = docSnap.id;
-            document.getElementById("articleCategory").value = data.category || "Steroids & Pharmacology";
-            document.getElementById("articleTitle").value = data.title || "";
-            document.getElementById("articleSummary").value = data.summary || "";
-            document.getElementById("articleContent").value = data.content || "";
-            document.getElementById("pdfUrlInput").value = data.pdfUrl || "";
-            document.getElementById("formHeading").textContent = "Edit Research Article";
-            document.getElementById("submitBtn").textContent = "Update Article";
-            document.getElementById("cancelEditBtn").style.display = "block";
-            window.scrollTo({ top: 300, behavior: 'smooth' });
+          card.querySelector(".edit-btn").addEventListener("click", () => {
+            editDocIdInput.value = id;
+            categoryInput.value = data.category || "Bioscience Research";
+            titleInput.value = data.title || "";
+            descInput.value = data.description || "";
+            pdfUrlInput.value = data.pdfUrl || "";
+            adLinkInput.value = data.adLink || DEFAULT_SMARTLINK;
+
+            formHeading.textContent = "Edit Research Article";
+            submitBtn.textContent = "💾 Update Article";
+            cancelEditBtn.style.display = "block";
+            window.scrollTo({ top: 0, behavior: "smooth" });
           });
 
-          // Delete Click
-          item.querySelector(".delete-btn").addEventListener("click", async () => {
-            if (confirm("Permanently delete this item?")) {
-              await deleteDoc(doc(db, "articles", docSnap.id));
-              loadAdminArticles();
+          card.querySelector(".delete-btn").addEventListener("click", async () => {
+            if (confirm(`Delete "${data.title}"?`)) {
+              await deleteDoc(doc(db, "articles", id));
+              showStatus("Article deleted!", "#ff0055");
+              loadArticles();
             }
           });
 
-          manageList.appendChild(item);
+          articlesList.appendChild(card);
         });
       } catch (err) {
-        manageList.innerHTML = `<p style="color:#ff3b5c;">Error: ${err.message}</p>`;
+        console.error(err);
+        articlesList.innerHTML = `<p style="color: #ff0055;">Error loading data.</p>`;
       }
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+
+      const payload = {
+        category: categoryInput.value,
+        title: titleInput.value.trim(),
+        description: descInput.value.trim(),
+        pdfUrl: pdfUrlInput.value.trim(),
+        adLink: adLinkInput.value.trim() || DEFAULT_SMARTLINK
+      };
+
+      try {
+        const editId = editDocIdInput.value;
+        if (editId) {
+          await updateDoc(doc(db, "articles", editId), payload);
+          showStatus("✅ Article Updated Successfully!", "#00ff88");
+        } else {
+          payload.createdAt = serverTimestamp();
+          await addDoc(articlesCol, payload);
+          showStatus("✅ New Article Published Live!", "#00f0ff");
+        }
+        resetForm();
+        loadArticles();
+      } catch (err) {
+        console.error(err);
+        showStatus("❌ Failed to save. Check Firestore rules.", "#ff0055");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    cancelEditBtn.addEventListener("click", resetForm);
+
+    function resetForm() {
+      form.reset();
+      editDocIdInput.value = "";
+      adLinkInput.value = DEFAULT_SMARTLINK;
+      formHeading.textContent = "Publish New Research";
+      submitBtn.textContent = "🚀 Publish Article";
+      cancelEditBtn.style.display = "none";
     }
+
+    function showStatus(msg, color) {
+      statusMsg.textContent = msg;
+      statusMsg.style.color = color;
+      setTimeout(() => { statusMsg.textContent = ""; }, 4000);
+    }
+
+    loadArticles();
   </script>
 </body>
 </html>
