@@ -55,9 +55,9 @@
         </form>
       </div>
 
-      <!-- 2. Publish New Article & PDF Book -->
+      <!-- 2. Publish Research Article & Free PDF Link -->
       <div class="admin-box">
-        <h2>2. Publish Research Article / PDF Book</h2>
+        <h2>2. Publish Research Article / Free PDF Book</h2>
         <form id="articleForm">
           <div class="form-group">
             <label for="articleCategory">Select Category</label>
@@ -70,7 +70,7 @@
           </div>
           <div class="form-group">
             <label for="articleTitle">Article / Book Title</label>
-            <input type="text" id="articleTitle" class="form-control" placeholder="e.g., Complete Pharmacology Guide Book.pdf" required />
+            <input type="text" id="articleTitle" class="form-control" placeholder="e.g., Complete Pharmacology Guide Book" required />
           </div>
           <div class="form-group">
             <label for="articleSummary">Short Summary</label>
@@ -81,8 +81,8 @@
             <textarea id="articleContent" class="form-control" placeholder="Write description or notes here..."></textarea>
           </div>
           <div class="form-group">
-            <label for="pdfFile">Upload PDF Book / Research File (Optional)</label>
-            <input type="file" id="pdfFile" class="form-control" accept=".pdf" />
+            <label for="pdfUrlInput">PDF Download Link (Google Drive / Direct URL - Optional)</label>
+            <input type="url" id="pdfUrlInput" class="form-control" placeholder="https://drive.google.com/file/d/.../view" />
           </div>
           <button type="submit" class="primary-btn">Publish Live Now</button>
           <div id="articleStatus" class="status-msg"></div>
@@ -101,7 +101,7 @@
   </main>
 
   <footer>
-    BioScience Hub CMS &bull; Secure Firebase Cloud Backend
+    BioScience Hub CMS &bull; 100% Free Firebase Firestore Backend
   </footer>
 
   <!-- Firebase Modular SDK -->
@@ -109,7 +109,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, getDoc, addDoc, getDocs, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDMmITK0UccstsasUCmDGnEoskDDCyTpIc",
@@ -123,7 +122,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     const loginSection = document.getElementById("loginSection");
     const dashboardSection = document.getElementById("dashboardSection");
@@ -192,25 +190,16 @@
       }
     });
 
-    // Publish Article with PDF Upload
+    // Publish Article with Free PDF Link
     document.getElementById("articleForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const status = document.getElementById("articleStatus");
       status.style.color = "#00f0ff";
-      status.textContent = "Uploading & Publishing...";
+      status.textContent = "Publishing live...";
 
       try {
-        const pdfFile = document.getElementById("pdfFile").files[0];
-        let pdfUrl = "";
+        const pdfUrl = document.getElementById("pdfUrlInput").value.trim();
 
-        if (pdfFile) {
-          status.textContent = "Uploading PDF file to storage...";
-          const storageRef = ref(storage, `books/${Date.now()}_${pdfFile.name}`);
-          const snapshot = await uploadBytes(storageRef, pdfFile);
-          pdfUrl = await getDownloadURL(snapshot.ref);
-        }
-
-        status.textContent = "Saving to database...";
         await addDoc(collection(db, "articles"), {
           category: document.getElementById("articleCategory").value,
           title: document.getElementById("articleTitle").value.trim(),
@@ -221,7 +210,7 @@
         });
 
         status.style.color = "#00e676";
-        status.textContent = "Published successfully with PDF!";
+        status.textContent = "Published successfully!";
         document.getElementById("articleForm").reset();
         loadAdminArticles();
       } catch (err) {
@@ -249,7 +238,7 @@
           item.innerHTML = `
             <div>
               <strong style="color:#fff;">${escapeHtml(data.title)}</strong>
-              <div style="font-size:0.82rem; color:#00f0ff;">${escapeHtml(data.category)} ${data.pdfUrl ? '📄 [PDF Attached]' : ''}</div>
+              <div style="font-size:0.82rem; color:#00f0ff;">${escapeHtml(data.category)} ${data.pdfUrl ? '🔗 [PDF Link Attached]' : ''}</div>
             </div>
             <button class="danger-btn">Delete</button>
           `;
