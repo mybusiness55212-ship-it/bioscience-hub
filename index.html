@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BioScience & Pharmacology Research Hub</title>
+  <title>BioScience Hub | Advanced Research & Clinical Portal</title>
   <style>
     :root {
       --bg-color: #030712;
-      --card-bg: rgba(13, 20, 38, 0.75);
+      --card-bg: rgba(13, 20, 38, 0.85);
       --neon-blue: #00f0ff;
+      --neon-purple: #9d4edd;
       --neon-glow: rgba(0, 240, 255, 0.25);
       --text-main: #ffffff;
       --text-muted: #94a3b8;
@@ -27,37 +28,113 @@
       color: var(--text-main);
       min-height: 100vh;
       padding: 2rem 1rem;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
+    /* Header & Hero */
     header {
       text-align: center;
-      margin-bottom: 2.5rem;
-      padding: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 2.5rem 1.5rem;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 30px var(--neon-glow);
+      border-radius: 20px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 0 40px var(--neon-glow);
+      animation: fadeInDown 0.8s ease;
     }
 
     header h1 {
       color: var(--neon-blue);
-      font-size: 2rem;
+      font-size: 2.4rem;
       margin-bottom: 0.5rem;
       text-transform: uppercase;
       letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
     }
 
     header p {
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
 
+    /* Search & Filter Bar */
+    .controls-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      animation: fadeIn 1s ease;
+    }
+
+    @media (min-width: 650px) {
+      .controls-bar {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .search-box {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.9rem 1rem 0.9rem 2.8rem;
+      background: rgba(13, 20, 38, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 15px var(--neon-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .category-filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: rgba(13, 20, 38, 0.8);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--neon-blue);
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    /* Articles Grid & Animations */
     .articles-grid {
       display: grid;
       gap: 1.5rem;
@@ -66,16 +143,18 @@
     .article-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.5rem;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-      transition: all 0.3s ease;
+      border-radius: 16px;
+      padding: 1.8rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeInUp 0.6s ease both;
     }
 
     .article-card:hover {
+      transform: translateY(-4px);
       border-color: var(--neon-blue);
-      box-shadow: 0 0 25px var(--neon-glow);
+      box-shadow: 0 0 30px var(--neon-glow);
     }
 
     .article-meta {
@@ -91,42 +170,58 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       background: rgba(0, 240, 255, 0.1);
-      padding: 0.25rem 0.75rem;
+      padding: 0.3rem 0.8rem;
       border-radius: 20px;
+      border: 1px solid rgba(0, 240, 255, 0.2);
     }
 
     .status {
       font-size: 0.75rem;
-      color: var(--text-muted);
+      color: #00ff88;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #00ff88;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ff88;
     }
 
     .article-title {
       color: var(--text-main);
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       margin-bottom: 0.75rem;
+      font-weight: 600;
     }
 
     .article-desc {
       color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.25rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
     }
 
-    .btn-group {
+    .card-footer {
       display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
+      justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 1rem;
     }
 
-    /* Clean Sleek Action Button */
     .action-btn {
-      background: transparent;
+      background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(0,119,255,0.2));
       color: var(--neon-blue);
       border: 1px solid var(--neon-blue);
-      padding: 0.5rem 1.25rem;
-      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
       text-decoration: none;
       font-weight: 600;
       font-size: 0.85rem;
@@ -142,18 +237,35 @@
       box-shadow: 0 0 15px var(--neon-glow);
     }
 
-    /* Subtle Sponsor Link */
     .sponsor-link {
       color: var(--text-muted);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       text-decoration: none;
       transition: color 0.2s;
-      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
     }
 
     .sponsor-link:hover {
       color: var(--neon-blue);
       text-decoration: underline;
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -165,12 +277,27 @@
       <p>Advanced Pharmacology & Clinical Research Documentation Portal</p>
     </header>
 
+    <!-- Search & Category Filters -->
+    <div class="controls-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search research papers, drugs, clinical trials...">
+      </div>
+      <div class="category-filters" id="categoryFilters">
+        <button class="filter-btn active" data-category="All">All Research</button>
+        <button class="filter-btn" data-category="Bioscience Research">Bioscience</button>
+        <button class="filter-btn" data-category="Pharmacology">Pharmacology</button>
+        <button class="filter-btn" data-category="Clinical Trial">Clinical Trials</button>
+      </div>
+    </div>
+
+    <!-- Live Articles Container -->
     <div class="articles-grid" id="liveArticlesContainer">
-      <p style="color: var(--text-muted); text-align: center;">Loading live research papers...</p>
+      <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Connecting to Secure Research Node...</p>
     </div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase & Real-time Logic SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -187,6 +314,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const container = document.getElementById("liveArticlesContainer");
+    const searchInput = document.getElementById("searchInput");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+
+    let allArticles = [];
+    let currentCategory = "All";
+    let searchQuery = "";
 
     async function fetchLiveArticles() {
       try {
@@ -194,39 +327,75 @@
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
-          container.innerHTML = `<p style="color: var(--text-muted); text-align: center;">No active research documents found.</p>`;
+          container.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 3rem;">No active research documents found in database.</p>`;
           return;
         }
 
-        container.innerHTML = "";
+        allArticles = [];
         snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          
-          const card = document.createElement("div");
-          card.className = "article-card";
-          card.innerHTML = `
-            <div class="article-meta">
-              <span class="badge">${data.category || 'Research'}</span>
-              <span class="status">Active Node</span>
-            </div>
-            <h3 class="article-title">${data.title}</h3>
-            <p class="article-desc">${data.description}</p>
-            <div class="btn-group">
-              <a href="${data.pdfUrl || '#'}" target="_blank" class="action-btn">
-                📄 View / Download PDF
-              </a>
-              <a href="${data.adLink || '#'}" target="_blank" class="sponsor-link">
-                ⚡ Sponsored Resource
-              </a>
-            </div>
-          `;
-          container.appendChild(card);
+          allArticles.push({ id: docSnap.id, ...docSnap.data() });
         });
+
+        renderArticles();
       } catch (err) {
         console.error(err);
-        container.innerHTML = `<p style="color: #ff0055; text-align: center;">Failed to load live feed from database.</p>`;
+        container.innerHTML = `<p style="color: #ff0055; text-align: center; padding: 3rem;">Failed to connect to Firebase database. Check Firestore rules.</p>`;
       }
     }
+
+    function renderArticles() {
+      const filtered = allArticles.filter(item => {
+        const matchesCategory = currentCategory === "All" || item.category === currentCategory;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              item.description.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 3rem;">No matching research documents found.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      filtered.forEach((data, index) => {
+        const card = document.createElement("div");
+        card.className = "article-card";
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.innerHTML = `
+          <div class="article-meta">
+            <span class="badge">${data.category || 'Research'}</span>
+            <span class="status">Verified Node</span>
+          </div>
+          <h3 class="article-title">${data.title}</h3>
+          <p class="article-desc">${data.description}</p>
+          <div class="card-footer">
+            <a href="${data.pdfUrl || '#'}" target="_blank" class="action-btn">
+              📄 View Document / PDF
+            </a>
+            <a href="${data.adLink || '#'}" target="_blank" class="sponsor-link">
+              ⚡ Sponsored Resource
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Search Event Listener
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value.trim();
+      renderArticles();
+    });
+
+    // Category Filter Event Listeners
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentCategory = btn.getAttribute("data-category");
+        renderArticles();
+      });
+    });
 
     fetchLiveArticles();
   </script>
